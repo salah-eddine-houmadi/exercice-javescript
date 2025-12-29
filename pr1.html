@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>IndexedDB Cursor Searching Demo</title>
+
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: radial-gradient(circle at top, #1f2937, #020617 60%);
+        color: #f9fafb;
+      }
+      .container {
+        width: 1100px;
+        max-width: 95vw;
+        background: #020617;
+        border-radius: 20px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+        border: 1px solid rgba(148,163,184,0.4);
+        padding: 25px 28px 30px;
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 22px;
+      }
+      .header { grid-column: 1/-1; text-align:center; margin-bottom:5px; }
+      .header h1 { margin:0; font-size:1.9rem; }
+      .header p { margin:6px 0 0; font-size:0.95rem; color:#9ca3af; }
+      .left-panel { display:flex; flex-direction:column; gap:16px; }
+      .card-section {
+        background: linear-gradient(145deg,#020617,#030712);
+        border-radius:14px;
+        padding:14px 16px 16px;
+        border:1px solid rgba(55,65,81,0.9);
+      }
+      .section-title { font-size:0.95rem; font-weight:600; margin-bottom:8px; color:#e5e7eb; }
+      .small-note { font-size:0.8rem; color:#9ca3af; margin-top:4px; }
+      label { font-size:0.85rem; color:#e5e7eb; }
+      .input-row { display:flex; gap:8px; margin-top:6px; align-items:center; }
+      input[type="text"], input[type="number"] {
+        flex:1;
+        padding:8px 10px;
+        border-radius:8px;
+        border:1px solid #4b5563;
+        outline:none;
+        background:#020617;
+        color:#f9fafb;
+        font-size:0.9rem;
+      }
+      input::placeholder { color:#6b7280; }
+      input:focus { border-color:#22c55e; box-shadow:0 0 0 1px rgba(34,197,94,0.5); }
+      button {
+        padding:8px 14px;
+        border-radius:10px;
+        border:none;
+        cursor:pointer;
+        font-size:0.85rem;
+        font-weight:600;
+        color:#e5e7eb;
+        background:#2563eb;
+        transition:background 0.18s,transform 0.12s,box-shadow 0.18s;
+        box-shadow:0 3px 10px rgba(37,99,235,0.4);
+      }
+      button:hover { background:#1d4ed8; transform:translateY(-1px); box-shadow:0 5px 16px rgba(37,99,235,0.6); }
+      button:active { transform:translateY(0); box-shadow:0 2px 8px rgba(37,99,235,0.35); }
+      .btn-secondary { background:#6b7280; box-shadow:0 3px 10px rgba(75,85,99,0.5); }
+      .btn-secondary:hover { background:#4b5563; }
+      #log {
+        background:#020617;
+        border-radius:10px;
+        border:1px solid rgba(148,163,184,0.4);
+        max-height:150px;
+        overflow-y:auto;
+        font-size:0.8rem;
+        padding:6px 8px;
+      }
+      .log-line { margin:2px 0; }
+      .log-ok { color:#22c55e; }
+      .log-error { color:#fb7185; }
+      .log-info { color:#e5e7eb; }
+      .right-panel { display:flex; flex-direction:column; gap:14px; }
+      .table-title { font-size:0.9rem; color:#e5e7eb; }
+      table {
+        width:100%;
+        border-collapse:collapse;
+        font-size:0.88rem;
+        background:#020617;
+        border-radius:10px;
+        overflow:hidden;
+        border:1px solid rgba(55,65,81,0.9);
+      }
+      thead { background:#0f172a; }
+      th,td { padding:7px 9px; border-bottom:1px solid rgba(31,41,55,0.9); text-align:left; }
+      th { font-weight:600; color:#e5e7eb; }
+      tbody tr:nth-child(even) { background:#020617; }
+      tbody tr:nth-child(odd) { background:#030712; }
+      .empty-note { font-size:0.8rem; color:#9ca3af; margin-top:4px; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>IndexedDB – Cursor Searching Demo</h1>
+        <p>Demonstration of <strong>cursors, indexes, and range searching</strong> in IndexedDB.</p>
+      </div>
+
+      <div class="left-panel">
+        <div class="card-section">
+          <div class="section-title">🔍 Search by Name</div>
+          <label for="searchName">Search users by <strong>name</strong>:</label>
+          <div class="input-row">
+            <input id="searchName" type="text" placeholder='e.g. "Ahmed"'/>
+            <button onclick="searchByName()">Search</button>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <div class="section-title">📈 Age &gt; X</div>
+          <label for="minAge">Show users where age is greater than:</label>
+          <div class="input-row">
+            <input id="minAge" type="number" placeholder="e.g. 25" min="0"/>
+            <button onclick="filterByAge()">Filter</button>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <div class="section-title">🎯 ID Range</div>
+          <label>Search users whose ID is between:</label>
+          <div class="input-row">
+            <input id="minId" type="number" placeholder="Min ID" min="1"/>
+            <input id="maxId" type="number" placeholder="Max ID" min="1"/>
+          </div>
+          <div class="input-row" style="margin-top:6px">
+            <button onclick="searchByIdRange()">Search Range</button>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <div class="section-title">🧾 Log</div>
+          <div id="log"></div>
+        </div>
+
+        <div class="card-section">
+          <div class="input-row">
+            <button class="btn-secondary" onclick="clearResults()">Clear Results</button>
+          </div>
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Name</th><th>Age</th></tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+          </table>
+          <div id="resultsEmpty" class="empty-note">No results</div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="card-section">
+          <div class="input-row">
+            <button class="btn-secondary" onclick="renderAllUsers()">Refresh</button>
+          </div>
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Name</th><th>Age</th></tr>
+            </thead>
+            <tbody id="allUsersBody"></tbody>
+          </table>
+          <div id="allUsersEmpty" class="empty-note">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let db;
+      const openRequest = indexedDB.open("CursorDemoDB", 1);
+
+      openRequest.onupgradeneeded = (e) => {
+        db = e.target.result;
+        const store = db.createObjectStore("users", { keyPath:"id" });
+        store.createIndex("nameIndex","name",{unique:false});
+        store.createIndex("ageIndex","age",{unique:false});
+        const users = [
+          {id:1,name:"Ahmed",age:25},{id:2,name:"Sara",age:22},{id:3,name:"Omar",age:30},
+          {id:4,name:"Lina",age:27},{id:5,name:"Ahmed",age:35},{id:6,name:"Hana",age:24},
+          {id:7,name:"Khaled",age:32},{id:8,name:"Noor",age:21},{id:9,name:"Yousef",age:29},
+          {id:10,name:"Reem",age:26},{id:11,name:"Ali",age:23},{id:12,name:"Mona",age:31},
+          {id:13,name:"Ahmed",age:40},{id:14,name:"Salma",age:20},{id:15,name:"Rami",age:27},
+          {id:16,name:"Huda",age:24},{id:17,name:"Omar",age:33},{id:18,name:"Tariq",age:29},
+          {id:19,name:"Nour",age:22},{id:20,name:"Ahmed",age:28}
+        ];
+        users.forEach(u => e.target.transaction.objectStore("users").add(u));
+      };
+
+      openRequest.onsuccess = (e) => {
+        db = e.target.result;
+        renderAllUsers();
+      };
+
+      function logMessage(msg, type="info"){
+        const d=document.createElement("div");
+        d.className="log-line "+(type==="ok"?"log-ok":type==="error"?"log-error":"log-info");
+        d.textContent=msg;
+        document.getElementById("log").appendChild(d);
+      }
+
+      function renderAllUsers(){
+        const tb=document.getElementById("allUsersBody"), note=document.getElementById("allUsersEmpty");
+        tb.innerHTML="";
+        note.textContent="Loading...";
+        const req=db.transaction("users").objectStore("users").openCursor(), rows=[];
+        req.onsuccess=e=>{
+          const c=e.target.result;
+          if(!c){ note.textContent=rows.length?`Total: ${rows.length}`:"No users"; return }
+          rows.push(c.value);
+          tb.innerHTML+=`<tr><td>${c.value.id}</td><td>${c.value.name}</td><td>${c.value.age}</td></tr>`;
+          c.continue();
+        }
+      }
+
+      function searchByName(){
+        const name=document.getElementById("searchName").value.trim();
+        const tb=document.getElementById("resultsBody"), note=document.getElementById("resultsEmpty");
+        tb.innerHTML=""; note.textContent="";
+        const req=db.transaction("users").objectStore("users").index("nameIndex").openCursor(), out=[];
+        req.onsuccess=e=>{
+          const c=e.target.result;
+          if(!c){ note.textContent=out.length?`Found ${out.length}`:"No match"; return }
+          if(c.key===name) out.push(c.value), tb.innerHTML+=`<tr><td>${c.value.id}</td><td>${c.value.name}</td><td>${c.value.age}</td></tr>`;
+          c.continue();
+        }
+      }
+
+      function filterByAge(){
+        const min=Number(document.getElementById("minAge").value.trim()), tb=document.getElementById("resultsBody"), note=document.getElementById("resultsEmpty");
+        tb.innerHTML=""; note.textContent="";
+        const req=db.transaction("users").objectStore("users").openCursor(), out=[];
+        req.onsuccess=e=>{
+          const c=e.target.result;
+          if(!c){ note.textContent=out.length?`Found ${out.length}`:"No match"; return }
+          if(c.value.age>min) out.push(c.value), tb.innerHTML+=`<tr><td>${c.value.id}</td><td>${c.value.name}</td><td>${c.value.age}</td></tr>`;
+          c.continue();
+        }
+      }
+
+      function searchByIdRange(){
+        const a=Number(document.getElementById("minId").value.trim()), b=Number(document.getElementById("maxId").value.trim()), tb=document.getElementById("resultsBody"), note=document.getElementById("resultsEmpty");
+        tb.innerHTML=""; note.textContent="";
+        const range=IDBKeyRange.bound(a,b), req=db.transaction("users").objectStore("users").openCursor(range), out=[];
+        req.onsuccess=e=>{
+          const c=e.target.result;
+          if(!c){ note.textContent=out.length?`Found ${out.length}`:"No match"; return }
+          out.push(c.value);
+          tb.innerHTML+=`<tr><td>${c.value.id}</td><td>${c.value.name}</td><td>${c.value.age}</td></tr>`;
+          c.continue();
+        }
+      }
+    </script>
+  </body>
+</html>
