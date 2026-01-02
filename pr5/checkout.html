@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout</title>
+    <style>
+      body {
+        font-family: Arial;
+        padding: 20px;
+        background: #f4f6f8;
+      }
+      h1 {
+        text-align: center;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+      }
+      button {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      .clear-btn {
+        background: #ef4444;
+        color: white;
+      }
+      .back-btn {
+        background: #4f46e5;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Checkout</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody id="cartTable"></tbody>
+    </table>
+
+    <h3>Total: <span id="total">0</span> $</h3>
+
+    <button class="clear-btn" onclick="clearCart()">Clear Cart</button>
+    <button class="back-btn" onclick="backToShop()">Back to Shop</button>
+
+    <script>
+      let db;
+      const request = indexedDB.open("ShopDB", 1);
+
+      request.onsuccess = (e) => {
+        db = e.target.result;
+        loadCart();
+      };
+
+      function loadCart() {
+        const tx = db.transaction("cart", "readonly");
+        const store = tx.objectStore("cart");
+        const tbody = document.getElementById("cartTable");
+        const totalSpan = document.getElementById("total");
+        tbody.innerHTML = "";
+        let total = 0;
+        store.openCursor().onsuccess = (e) => {
+          const cursor = e.target.result;
+          if (cursor) {
+            const item = cursor.value;
+            const row = document.createElement("tr");
+            row.innerHTML = `<td>${item.name}</td>
+                       <td>${item.quantity}</td>
+                       <td>${item.price}</td>
+                       <td>${item.price * item.quantity}</td>`;
+            tbody.appendChild(row);
+            total += item.price * item.quantity;
+            cursor.continue();
+          }
+          totalSpan.textContent = total;
+        };
+      }
+
+      function clearCart() {
+        const tx = db.transaction("cart", "readwrite");
+        tx.objectStore("cart").clear().onsuccess = () => {
+          loadCart();
+          alert("Cart cleared");
+        };
+      }
+
+      function backToShop() {
+        window.location.href = "shop.html";
+      }
+    </script>
+  </body>
+</html>

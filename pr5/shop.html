@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo Shop</title>
+    <style>
+      body {
+        font-family: Arial;
+        padding: 20px;
+        background: #f4f6f8;
+      }
+      h1 {
+        text-align: center;
+      }
+      .products {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+      }
+      .product {
+        background: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      button {
+        padding: 5px 10px;
+        margin-top: 5px;
+        cursor: pointer;
+        border-radius: 5px;
+        border: none;
+        background: #4f46e5;
+        color: white;
+      }
+      .cart-summary {
+        margin-top: 20px;
+        background: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .qty-btn {
+        padding: 2px 6px;
+        margin: 0 2px;
+        background: #ef4444;
+        color: white;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Demo Shop</h1>
+
+    <div class="products" id="products"></div>
+
+    <div class="cart-summary">
+      <h3>Shopping Cart</h3>
+      <ul id="cartItems"></ul>
+      <strong>Total: <span id="total">0</span> $</strong><br />
+      <button onclick="goToCheckout()">Proceed to Checkout</button>
+    </div>
+
+    <script>
+      let db;
+
+      // Open IndexedDB
+      const request = indexedDB.open("ShopDB", 1);
+
+      request.onupgradeneeded = (e) => {
+        db = e.target.result;
+
+        // Create products store
+        if (!db.objectStoreNames.contains("products")) {
+          const store = db.createObjectStore("products", { keyPath: "id" });
+          store.transaction.oncomplete = () => {
+            const prodStore = db
+              .transaction("products", "readwrite")
+              .objectStore("products");
+            const products = [
+              { id: 1, name: "Laptop", price: 800 },
+              { id: 2, name: "Smartphone", price: 500 },
+              { id: 3, name: "Headphones", price: 50 },
+              { id: 4, name: "Keyboard", price: 30 },
+              { id: 5, name: "Mouse", price: 20 },
+            ];
+            products.forEach((p) => prodStore.add(p));
+          };
+        }
+
+        // Create cart store
+        if (!db.objectStoreNames.contains("cart")) {
+          db.createObjectStore("cart", { keyPath: "id" });
+        }
+      };
+
+      request.onsuccess = (e) => {
+        db = e.target.result;
+        loadProducts();
+        loadCart();
+      };
+
+      // Load products
+      function loadProducts() {
+        const tx = db.transaction("products", "readonly");
+        const store = tx.objectStore("products");
+        const productsDiv = document.getElementById("products");
+        productsDiv.innerHTML = "";
+
+        store.openCursor().onsuccess = (e) => {
+          const cursor = e.target.result;
+          if (cursor) {
+            const p = cursor.value;
+            const div = document.createElement("div");
+            div.className = "product";
+            div.innerHTML = `
+        <strong>${p.name}</strong><br>
+        Price: ${p.price} $<br>
+        <button onclick="addToCart(${p.id}, '${p.name}', ${p.price})">Add to Cart</button>
+      `;
+            productsDiv.appendChild(div);
+            cursor.continue();
+          }
+        };
+      }
+
+      // Add item to cart
+      function addToCart(id, name, price) {
+        const tx = db.transaction("cart", "readwrite");
+        const store = tx.objectStore("cart");
+        store.get(id).onsuccess = (e) => {
+          const item = e.target.result;
+          if (item) {
+            item.quantity++;
+            store.put(item);
+          } else {
+            store.add({ id, name, price, quantity: 1 });
+          }
+          loadCart();
+        };
+      }
+
+      // Update quantity (+ / -)
+      function updateQty(id, change) {
+        const tx = db.transaction("cart", "readwrite");
+        const store = tx.objectStore("cart");
+        store.get(id).onsuccess = (e) => {
+          const item = e.target.result;
+          if (item) {
+            item.quantity += change;
+            if (item.quantity <= 0) {
+              store.delete(id);
+            } else {
+              store.put(item);
+            }
+            loadCart();
+          }
+        };
+      }
+
+      // Load cart
+      function loadCart() {
+        const tx = db.transaction("cart", "readonly");
+        const store = tx.objectStore("cart");
+        const cartItems = document.getElementById("cartItems");
+        const totalSpan = document.getElementById("total");
+        cartItems.innerHTML = "";
+        let total = 0;
+
+        store.openCursor().onsuccess = (e) => {
+          const cursor = e.target.result;
+          if (cursor) {
+            const item = cursor.value;
+            const li = document.createElement("li");
+            li.innerHTML = `
+        ${item.name} × ${item.quantity} = ${item.price * item.quantity} $
+        <button class="qty-btn" onclick="updateQty(${item.id},1)">+</button>
+        <button class="qty-btn" onclick="updateQty(${item.id},-1)">-</button>
+      `;
+            cartItems.appendChild(li);
+            total += item.price * item.quantity;
+            cursor.continue();
+          }
+          totalSpan.textContent = total;
+        };
+      }
+
+      // Go to checkout
+      function goToCheckout() {
+        window.location.href = "checkout.html";
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,138 @@
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f2f5;
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+
+.tables {
+  width: 25%;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.tables h3 {
+  margin-bottom: 15px;
+  color: #4f46e5;
+  font-size: 1.2rem;
+}
+
+.table {
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #e5e7eb;
+  transition: all 0.2s ease;
+  font-weight: 600;
+}
+
+.table.open {
+  background-color: #a7f3d0;
+}
+
+.table.selected {
+  border: 2px solid #4f46e5;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.menu {
+  width: 70%;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.menu h3 {
+  margin-bottom: 15px;
+  color: #4f46e5;
+  font-size: 1.2rem;
+}
+
+.menu-item {
+  background-color: #f9fafb;
+  padding: 15px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+}
+
+.menu-item button {
+  background-color: #4f46e5;
+  color: white;
+  font-weight: 600;
+}
+
+.menu-item button:hover {
+  background-color: #4338ca;
+}
+
+#orderList {
+  margin-top: 10px;
+  list-style: none;
+}
+
+#orderList li {
+  background-color: #f3f4f6;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.qty-btn {
+  background-color: #ef4444;
+  color: white;
+  border-radius: 4px;
+  padding: 3px 7px;
+  margin-left: 4px;
+  font-size: 0.9rem;
+}
+
+.qty-btn:hover {
+  background-color: #dc2626;
+}
+
+
+.menu button:last-child {
+  margin-top: 15px;
+  background-color: #10b981;
+  color: white;
+  font-weight: 600;
+}
+
+.menu button:last-child:hover {
+  background-color: #059669;
+}

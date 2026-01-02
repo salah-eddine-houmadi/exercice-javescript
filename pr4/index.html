@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Students Manager</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Students Manager</h1>
+
+    <div class="form-container">
+      <input id="name" placeholder="Name" />
+      <input id="email" placeholder="Email" />
+      <button onclick="addStudent()">Add Student</button>
+    </div>
+
+    <div class="students-grid" id="studentsGrid"></div>
+
+    <div class="modal" id="editModal">
+      <div class="modal-content">
+        <h3>Edit Student</h3>
+        <input id="editName" placeholder="Name" />
+        <input id="editEmail" placeholder="Email" />
+        <div class="modal-buttons">
+          <button class="save-btn" onclick="updateStudent()">Save</button>
+          <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

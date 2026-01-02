@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DateDiff Utility</title>
+    <style>
+      body {
+        font-family: Arial;
+        background: #f0f2f5;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      .container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        width: 400px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        color: #4f46e5;
+      }
+      input,
+      button {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+      }
+      button {
+        background-color: #4f46e5;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+      }
+      button:hover {
+        background-color: #4338ca;
+      }
+      .result {
+        margin-top: 15px;
+        padding: 10px;
+        background: #f3f4f6;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>DateDiff Utility</h1>
+
+      <label>Start Date:</label>
+      <input type="date" id="startDate" />
+
+      <label>End Date:</label>
+      <input type="date" id="endDate" />
+
+      <button onclick="calculateDiff()">Calculate Difference</button>
+      <button onclick="demo()">Demo Last 90 Days</button>
+      <button onclick="clearFields()">Clear</button>
+
+      <div class="result" id="result">Difference will appear here</div>
+    </div>
+
+    <script>
+      function stripTime(date) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      }
+
+      function calculateDiff() {
+        const startInput = document.getElementById("startDate").value;
+        const endInput = document.getElementById("endDate").value;
+        const resultDiv = document.getElementById("result");
+
+        if (!startInput || !endInput) {
+          resultDiv.textContent = "❌ Please enter both dates";
+          return;
+        }
+
+        let start = new Date(startInput);
+        let end = new Date(endInput);
+
+        // Auto-swap if start > end
+        if (start > end) [start, end] = [end, start];
+
+        start = stripTime(start);
+        end = stripTime(end);
+
+        // Total days
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const totalDays = Math.round((end - start) / msPerDay);
+
+        // Total weeks
+        const totalWeeks = Math.floor(totalDays / 7);
+
+        // Full months
+        let months =
+          (end.getFullYear() - start.getFullYear()) * 12 +
+          (end.getMonth() - start.getMonth());
+        if (end.getDate() < start.getDate()) months -= 1;
+
+        // Full years
+        let years = end.getFullYear() - start.getFullYear();
+        if (
+          end.getMonth() < start.getMonth() ||
+          (end.getMonth() === start.getMonth() &&
+            end.getDate() < start.getDate())
+        ) {
+          years -= 1;
+        }
+
+        resultDiv.innerHTML = `
+    ✅ Total Days: ${totalDays}<br>
+    ✅ Total Weeks: ${totalWeeks}<br>
+    ✅ Full Months: ${months}<br>
+    ✅ Full Years: ${years}
+  `;
+      }
+
+      function demo() {
+        const today = new Date();
+        const past = new Date();
+        past.setDate(today.getDate() - 90);
+        document.getElementById("startDate").value = past
+          .toISOString()
+          .slice(0, 10);
+        document.getElementById("endDate").value = today
+          .toISOString()
+          .slice(0, 10);
+        calculateDiff();
+      }
+
+      function clearFields() {
+        document.getElementById("startDate").value = "";
+        document.getElementById("endDate").value = "";
+        document.getElementById("result").textContent =
+          "Difference will appear here";
+      }
+    </script>
+  </body>
+</html>

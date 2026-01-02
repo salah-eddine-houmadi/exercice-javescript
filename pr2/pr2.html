@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+</head>
+    <body>
+
+           <div class="container">
+
+            <input id="t" placeholder="task">
+            <button onclick="a()">Add</button>
+            <select id="f" onchange="r()">
+                <option>all</option>
+                <option>not valid</option>
+                <option>valid</option>
+            </select>
+            <input id="s" placeholder="search">
+            </div>
+
+            <ul id="l"></ul>
+
+    </body>
+<script>
+    let db, i = [];
+    openDB();
+
+    function openDB() {
+        let r = indexedDB.open("db", 1);
+        r.onupgradeneeded = e => e.target.result.createObjectStore("ts", { keyPath: "id" });
+        r.onsuccess = e => { db = e.target.result; r(); };
+    }
+
+    function a() {
+        let tEl = document.getElementById("t");
+        if(!tEl.value.trim()) return;
+
+        let o = { id: Date.now(), t: tEl.value, s: "not valid" };
+        db.transaction("ts","readwrite").objectStore("ts").add(o);
+        tEl.value = "";
+        r();
+    }
+
+    function r() {
+        let fEl = document.getElementById("f"); 
+        let sEl = document.getElementById("s"); 
+        let lEl = document.getElementById("l"); 
+
+        let st = fEl.value;
+        let q = sEl.value.toLowerCase();
+
+        db.transaction("ts").objectStore("ts").getAll().onsuccess = e => {
+            i = e.target.result;
+
+            let x = i.filter(o => o.t && (st === "all" || o.s === st) && o.t.toLowerCase().includes(q));
+
+            lEl.innerHTML = x.map(o => `
+            <li data-id="${o.id}" class="${o.s === 'valid' ? 'valid' : 'not-valid'}">
+                ${o.t} [${o.s}]
+                <span>
+                    <button onclick="u(${o.id})">Verified</button>
+                    <button onclick="d(${o.id})">x</button>
+                </span>
+            </li>
+            `).join("");
+        };
+    }
+
+    function u(id) {
+        let store = db.transaction("ts","readwrite").objectStore("ts");
+        store.get(id).onsuccess = e => {
+            let o = e.target.result;
+
+            o.s = o.s === "not valid" ? "valid" : "not valid";
+            store.put(o);
+            r();
+        };
+    }
+
+    function d(id) {
+        db.transaction("ts","readwrite").objectStore("ts").delete(id);
+        r();
+    }
+</script>
+
+</html>

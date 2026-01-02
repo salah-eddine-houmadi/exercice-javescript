@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Age Calculator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>Age Calculator</h1>
+  
+  <label>Birth Date:</label>
+  <input type="date" id="birthDate">
+  
+  <button onclick="calculateAge()">Calculate Age</button>
+  <button onclick="useToday()">Use Today (Demo)</button>
+  <button onclick="clearFields()">Clear</button>
+  
+  <div class="result" id="result">Your age will appear here</div>
+</div>
+
+<script>
+function calculateAge() {
+  const input = document.getElementById('birthDate').value;
+  const resultDiv = document.getElementById('result');
+  if (!input) { resultDiv.textContent = "❌ Please enter your birth date"; return; }
+
+  const birth = new Date(input);
+  const today = new Date();
+
+  if (birth > today) { resultDiv.textContent = "❌ Birth date cannot be in the future"; return; }
+
+  // Calculate years, months, days
+  let years = today.getFullYear() - birth.getFullYear();
+  let months = today.getMonth() - birth.getMonth();
+  let days = today.getDate() - birth.getDate();
+
+  if (days < 0) {
+    months -= 1;
+    days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+  }
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+
+  // Next birthday
+  let nextBirthday = new Date(today.getFullYear(), birth.getMonth(), birth.getDate());
+  if (nextBirthday < today) nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
+  const diffDays = Math.ceil((nextBirthday - today)/(1000*60*60*24));
+
+  resultDiv.innerHTML = `
+    ✅ Age: ${years} years, ${months} months, ${days} days<br>
+    🎉 Next birthday in: ${diffDays} days
+  `;
+}
+
+// Quick demo button
+function useToday() {
+  const todayStr = new Date().toISOString().slice(0,10);
+  document.getElementById('birthDate').value = todayStr;
+  document.getElementById('result').textContent = "Ready…";
+}
+
+// Clear all fields
+function clearFields() {
+  document.getElementById('birthDate').value = '';
+  document.getElementById('result').textContent = 'Your age will appear here';
+}
+</script>
+
+</body>
+</html>

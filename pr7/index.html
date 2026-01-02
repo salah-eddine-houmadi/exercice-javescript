@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href="style.css" />
+  
+  </head>
+  <body>
+    <h1>Currency Converter</h1>
+
+    <div class="converter">
+      <label>Amount:</label>
+      <input type="number" id="amount" value="1" min="0" step="0.01" />
+
+      <label>From:</label>
+      <select id="fromCurrency"></select>
+
+      <label>To:</label>
+      <select id="toCurrency"></select>
+
+      <button onclick="convert()">Convert</button>
+
+      <div class="result" id="result">Result will appear here</div>
+
+      <h3>Last 7 Days Rates:</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Rate</th>
+          </tr>
+        </thead>
+        <tbody id="history"></tbody>
+      </table>
+    </div>
+
+    <script>
+      const fromSelect = document.getElementById("fromCurrency");
+      const toSelect = document.getElementById("toCurrency");
+      const resultDiv = document.getElementById("result");
+      const historyBody = document.getElementById("history");
+
+      // Load currencies from Frankfurter API
+      async function loadCurrencies() {
+        const res = await fetch("https://api.frankfurter.app/currencies");
+        const data = await res.json();
+        for (let code in data) {
+          const option1 = document.createElement("option");
+          option1.value = code;
+          option1.text = `${code} — ${data[code]}`;
+          const option2 = option1.cloneNode(true);
+          fromSelect.add(option1);
+          toSelect.add(option2);
+        }
+        fromSelect.value = "USD";
+        toSelect.value = "EUR";
+      }
+      loadCurrencies();
+
+      // Convert function
+      async function convert() {
+        const amount = parseFloat(document.getElementById("amount").value);
+        const from = fromSelect.value;
+        const to = toSelect.value;
+        if (!amount || from === to) {
+          alert("Enter valid amount and different currencies");
+          return;
+        }
+        try {
+          // Latest conversion
+          const res = await fetch(
+            `https://api.frankfurter.app/latest?amount=${amount}&from=${from}&to=${to}`
+          );
+          const data = await res.json();
+          const converted = data.rates[to];
+          resultDiv.textContent = `${amount} ${from} = ${converted.toFixed(
+            4
+          )} ${to}`;
+
+          // Last 7 days history
+          const end = new Date();
+          const start = new Date();
+          start.setDate(end.getDate() - 7);
+          const startStr = start.toISOString().slice(0, 10);
+          const endStr = end.toISOString().slice(0, 10);
+          const histRes = await fetch(
+            `https://api.frankfurter.app/${startStr}..${endStr}?from=${from}&to=${to}`
+          );
+          const histData = await histRes.json();
+
+          historyBody.innerHTML = "";
+          for (let date in histData.rates) {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${date}</td><td>${histData.rates[date][
+              to
+            ].toFixed(4)}</td>`;
+            historyBody.appendChild(tr);
+          }
+        } catch (err) {
+          console.error(err);
+          resultDiv.textContent = "Error fetching rates";
+        }
+      }
+    </script>
+  </body>
+</html>

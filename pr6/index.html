@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restaurant Table Manager</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="tables">
+        <h3>Tables</h3>
+        <div id="tablesList"></div>
+        <button onclick="addTable()">Add Table</button>
+    </div>
+
+    <div class="menu">
+        <h3>Menu</h3>
+        <div id="menuList"></div>
+        <h3>Order for Selected Table</h3>
+        <ul id="orderList"></ul>
+        <strong>Total: $<span id="total">0</span></strong><br />
+        <button onclick="printCheck()">Print Check</button>
+    </div>
+
+    <script>
+        let tables = [
+            { id: 1, name: "Table 1", status: "open" },
+            { id: 2, name: "Table 2", status: "closed" },
+            { id: 3, name: "Table 3", status: "open" },
+        ];
+        let menu = [
+            { id: 1, name: "Pizza", price: 12 },
+            { id: 2, name: "Burger", price: 8 },
+            { id: 3, name: "Salad", price: 5 },
+        ];
+        let selectedTableId = null;
+        let ordersByTable = {}; 
+
+        function renderTables() {
+            const div = document.getElementById("tablesList");
+            div.innerHTML = "";
+            tables.forEach((t) => {
+                const tdiv = document.createElement("div");
+                tdiv.className = "table";
+                if (t.status === "open") tdiv.classList.add("open");
+                if (t.id === selectedTableId) tdiv.classList.add("selected");
+                tdiv.innerText = `${t.name} (${t.status})`;
+                tdiv.onclick = () => selectTable(t.id);
+                div.appendChild(tdiv);
+            });
+        }
+
+        function addTable() {
+            const id = tables.length + 1;
+            tables.push({ id, name: `Table ${id}`, status: "open" });
+            renderTables();
+        }
+
+        function selectTable(id) {
+            selectedTableId = id;
+            renderTables();
+            renderOrder();
+        }
+
+        function renderMenu() {
+            const div = document.getElementById("menuList");
+            div.innerHTML = "";
+            menu.forEach((item) => {
+                const mdiv = document.createElement("div");
+                mdiv.className = "menu-item";
+                mdiv.innerHTML = `<strong>${item.name}</strong> - $${item.price} 
+      <button onclick="addToOrder(${item.id})">Add</button>`;
+                div.appendChild(mdiv);
+            });
+        }
+
+        function addToOrder(itemId) {
+            if (selectedTableId === null) return alert("Select a table first");
+            const item = menu.find((m) => m.id === itemId);
+            if (!ordersByTable[selectedTableId])
+                ordersByTable[selectedTableId] = [];
+            const order = ordersByTable[selectedTableId];
+            const existing = order.find((o) => o.id === itemId);
+            if (existing) existing.quantity++;
+            else
+                order.push({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: 1,
+                });
+            renderOrder();
+        }
+
+        function renderOrder() {
+            const ul = document.getElementById("orderList");
+            ul.innerHTML = "";
+            if (selectedTableId === null) return;
+            const order = ordersByTable[selectedTableId] || [];
+            let total = 0;
+            order.forEach((item) => {
+                const li = document.createElement("li");
+                li.innerHTML = `${item.name} × ${item.quantity} = $${item.price * item.quantity
+                    }
+      <button class="qty-btn" onclick="updateQty(${item.id},1)">+</button>
+      <button class="qty-btn" onclick="updateQty(${item.id},-1)">-</button>
+      <button onclick="removeItem(${item.id})">Remove</button>`;
+                ul.appendChild(li);
+                total += item.price * item.quantity;
+            });
+            document.getElementById("total").innerText = total;
+        }
+
+        function updateQty(itemId, change) {
+            const order = ordersByTable[selectedTableId];
+            const item = order.find((o) => o.id === itemId);
+            if (!item) return;
+            item.quantity += change;
+            if (item.quantity <= 0) removeItem(itemId);
+            renderOrder();
+        }
+
+        function removeItem(itemId) {
+            const order = ordersByTable[selectedTableId];
+            ordersByTable[selectedTableId] = order.filter((o) => o.id !== itemId);
+            renderOrder();
+        }
+
+        function printCheck() {
+            if (selectedTableId === null) return alert("Select a table first");
+            const order = ordersByTable[selectedTableId] || [];
+            let html = `<h2>Bill for Table ${selectedTableId}</h2><ul>`;
+            let total = 0;
+            order.forEach((i) => {
+                html += `<li>${i.name} × ${i.quantity} = $${i.price * i.quantity
+                    }</li>`;
+                total += i.price * i.quantity;
+            });
+            html += `</ul><strong>Total: $${total}</strong>`;
+            const win = window.open("", "", "width=400,height=600");
+            win.document.write(html);
+            win.print();
+            // clear order and close table after printing
+            ordersByTable[selectedTableId] = [];
+            tables.find((t) => t.id === selectedTableId).status = "closed";
+            renderTables();
+            renderOrder();
+        }
+
+        // initial render
+        renderTables();
+        renderMenu();
+    </script>
+</body>
+
+</html>

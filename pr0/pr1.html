@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Certificat Professionnel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Roboto&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="form">
+    <h3>Générer un certificat</h3>
+    <input id="nameInput" placeholder="Nom du participant" />
+    <div id="nameErr" class="error"></div>
+    <input id="courseInput" placeholder="Nom de la formation" />
+    <div id="courseErr" class="error"></div>
+    <input type="file" id="signInput" accept="image/*" />
+    <button id="printBtn" disabled>Imprimer</button>
+    <button id="demoBtn">Exemple</button>
+    <button id="resetBtn">Reset</button>
+  </div>
+
+  <div id="cert">
+    <img id="logo" src="Certified.png" alt="Logo" />
+    <div id="watermark">CERTIFICAT</div>
+    <h1>Certificat de réussite</h1>
+    <p>Ce certificat est attribué à :</p>
+    <h2 id="certName">...</h2>
+    <p>Pour avoir complété la formation :</p>
+    <h3 id="certCourse">...</h3>
+    <div id="date">Date : <span id="certDate">...</span></div>
+    <img id="signature" src="" />
+  </div>
+
+  <script>
+    let signURL = null;
+    const nameInput = document.getElementById("nameInput");
+    const courseInput = document.getElementById("courseInput");
+    const certName = document.getElementById("certName");
+    const certCourse = document.getElementById("certCourse");
+    const signInput = document.getElementById("signInput");
+    const signature = document.getElementById("signature");
+    const printBtn = document.getElementById("printBtn");
+    const demoBtn = document.getElementById("demoBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const certDate = document.getElementById("certDate");
+
+    function updateDate() {
+      const now = new Date();
+      certDate.textContent = now.toLocaleDateString("fr-FR");
+    }
+    updateDate();
+
+    nameInput.oninput = () => {
+      certName.textContent = nameInput.value;
+      validate();
+    };
+    courseInput.oninput = () => {
+      certCourse.textContent = courseInput.value;
+      validate();
+    };
+
+    signInput.onchange = (e) => {
+      if (signURL) URL.revokeObjectURL(signURL);
+      signURL = URL.createObjectURL(e.target.files[0]);
+      signature.src = signURL;
+    };
+
+    function validate() {
+      let valid = true;
+      if (nameInput.value.trim().length < 3) {
+        nameErr.textContent = "Minimum 3 caractères";
+        valid = false;
+      } else nameErr.textContent = "";
+
+      if (courseInput.value.trim().length < 3) {
+        courseErr.textContent = "Minimum 3 caractères";
+        valid = false;
+      } else courseErr.textContent = "";
+
+      printBtn.disabled = !valid;
+    }
+
+    printBtn.onclick = () => window.print();
+
+    demoBtn.onclick = () => {
+      nameInput.value = "Salah-eddine Houmadi";
+      courseInput.value = "Formation Professionnelle";
+      certName.textContent = nameInput.value;
+      certCourse.textContent = courseInput.value;
+      updateDate();
+      validate();
+    };
+
+    resetBtn.onclick = () => {
+      nameInput.value = "";
+      courseInput.value = "";
+      certName.textContent = "...";
+      certCourse.textContent = "...";
+      signature.src = "";
+      updateDate();
+      if (signURL) URL.revokeObjectURL(signURL);
+      signURL = null;
+      printBtn.disabled = true;
+    };
+  </script>
+</body>
+
+</html>
