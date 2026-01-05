@@ -1,0 +1,194 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  text-decoration: none;
+  font-family: "PT Sans Narrow", sans-serif;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+.container {
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(#2c2e31, #2b2c31);
+  display: grid;
+  place-items: center;
+}
+
+.landing {
+  width: 95%;
+  height: 90%;
+  background-color: #242529;
+  box-shadow: 0 1rem 4rem rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.navbar {
+  width: 100%;
+  height: 15rem;
+  padding: 0 10rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo span {
+  font-family: "Passion One", cursive;
+  font-size: 8rem;
+  color: #fff;
+  text-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.2rem;
+  position: relative;
+}
+
+.logo span::after {
+  content: "";
+  position: absolute;
+  width: 9.5rem;
+  height: 0.5rem;
+  background-color: #444;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.navigation a {
+  font-size: 2rem;
+  margin-right: 5rem;
+  color: #52545a;
+  letter-spacing: 0.1rem;
+  transition: color 0.3s;
+}
+
+.navigation a:nth-child(1) {
+  color: #ddd;
+}
+
+.navigation a:hover {
+  color: #ddd;
+}
+
+.lamp {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20rem;
+  height: 30rem;
+}
+
+.wire {
+  width: 0.4rem;
+  height: 10rem;
+  background-color: #1e2024;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.shade {
+  width: 100%;
+  height: 10rem;
+  background-color: #000;
+  position: absolute;
+  top: 10rem;
+  border-radius: 50% 50% 0 0;
+  background: linear-gradient(#2d3136, #242529);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.shade::after {
+  content: "";
+  width: 100%;
+  height: 2rem;
+  position: absolute;
+  bottom: -1rem;
+  left: 0;
+  border-radius: 50%;
+  background-color: #2d3237;
+}
+
+.bulb {
+  width: 3rem;
+  height: 2.5rem;
+  background-color: #fff;
+  position: absolute;
+  bottom: 8.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 0 0 50% 50%;
+  box-shadow: 0 0.5rem 2rem rgba(255, 255, 255, 0.3);
+}
+
+.light {
+  width: 100%;
+  height: 50rem;
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.3),
+    transparent,
+    transparent
+  );
+  position: absolute;
+  top: 19rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 30% 30% 0 0;
+  filter: blur(1rem);
+  opacity: 0.3;
+}
+
+.shadow {
+  width: 40rem;
+  height: 8rem;
+  background: linear-gradient(to right, transparent, #000, transparent);
+  position: absolute;
+  bottom: -45rem;
+  left: 50%;
+  transform: translateX(-50%) rotateX(-70deg);
+  border-radius: 50%;
+  filter: blur(2rem);
+  opacity: 0.3;
+}
+
+.banner-heading-main {
+  position: absolute;
+  top: 25%;
+  left: 26%;
+  font-family: "Oswald", sans-serif;
+  font-size: 20rem;
+  text-transform: uppercase;
+  color: #414247;
+  letter-spacing: 10rem;
+  opacity: 0.5;
+  background: linear-gradient(#414247, transparent 70%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.banner-heading {
+  position: absolute;
+  bottom: 35rem;
+  right: 23%;
+  font-family: "Passion One", cursive;
+  font-size: 8rem;
+  text-transform: uppercase;
+  color: #bbb;
+  letter-spacing: 2rem;
+  text-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+}
+
+.banner-paragraph {
+  position: absolute;
+  bottom: 30rem;
+  right: 24%;
+  font-family: "Oswald", sans-serif;
+  font-size: 3rem;
+  font-weight: 300;
+  color: #6c6d70;
+  letter-spacing: 0.1rem;
+}

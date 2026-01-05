@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Signika+Negative:wght@300..700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Document</title>
+  </head>
+  <div class="container">
+  <div class="player">
+    <div class="player-top">
+      <button class="player-btn"><i class="fa-solid fa-arrow-left"></i></button>
+      <span>Spotify Music App</span>
+      <button class="player-btn"><i class="fa-solid fa-ellipsis"></i></button>
+    </div>
+
+    <div class="player-body">
+      <div class="current-song">
+        <div class="cover">
+          <span class="song-title">King Canyon</span>
+          <span class="artist-name">Mulholland</span>
+        </div>
+
+        <button class="like-btn"><i class="fa-solid fa-heart"></i></button>
+      </div>
+
+      <div class="player-controls">
+        <button id="prev"><i class="fa-solid fa-backward-step"></i></button>
+        <button id="play"><i class="fa-solid fa-play"></i></button>
+        <button id="next"><i class="fa-solid fa-forward-step"></i></button>
+      </div>
+
+      <div class="progress-bar">
+        <span id="current-time">0:00</span>
+        <div class="bar"><div class="fill" id="fill"></div></div>
+        <span id="duration">0:00</span>
+      </div>
+
+      <audio id="audio" src="music.mp3"></audio>
+    </div>
+  </div>
+</div>
+
+</html>
