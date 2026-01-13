@@ -1,0 +1,187 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    font-family: "Secular One", sans-serif;
+}
+
+html {
+    font-size: 62.5%;
+}
+
+.container {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.landing {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0, 0, 0, .8), rgba(0, 0, 0, .9)), url(images/bg.jpg) center no-repeat;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.landing h1 {
+    font-size: 10rem;
+    color: #caa500;
+    text-shadow: 0 3rem 6rem rgba(0, 0, 0, .7);
+    letter-spacing: .3rem;
+    --fill-color: #caa500;
+    -webkit-text-stroke: .1rem var(--fill-color);
+    color: transparent;
+}
+
+.navigation {
+    width: 8rem;
+    height: 8rem;
+    background-color: #282a31;
+    position: absolute;
+    top: 4rem;
+    right: 4rem;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, .7);
+    animation: bgAnim 7s linear infinite;
+    transition: top .4s 1.1s cubic-bezier(0.23, 1, 0.32, 1),  
+                        right .4s 1.1s cubic-bezier(0.23, 1, 0.32, 1),
+                        transform .3s 1.1s ease,
+                        width .7s .4s cubic-bezier(0.23, 1, 0.32, 1),
+                        height .7s .4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.change .navigation {
+    top: 50%;
+    right: 50%;
+    transform: translate(50%, -50%);
+    width: 200%;
+    height: 200%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    animation-play-state: paused;
+    transition: top .4s .7s cubic-bezier(0.23, 1, 0.32, 1),       
+                        right .4s .7s cubic-bezier(0.23, 1, 0.32, 1),
+                        transform .3s .7s ease, 
+                        width .8s 1s cubic-bezier(0.23, 1, 0.32, 1), 
+                        height .8s 1s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes bgAnim {
+    0%,100% { 
+        border-radius: 63% 37% 54% 46% / 55% 48% 52% 45%; 
+    } 
+
+  14% { 
+        border-radius: 40% 60% 54% 46% / 49% 60% 40% 51%; 
+    }
+
+  28% { 
+        border-radius: 54% 46% 38% 62% / 49% 70% 30% 51%; 
+    } 
+
+  42% { 
+        border-radius: 61% 39% 55% 45% / 61% 38% 62% 39%; 
+    } 
+
+  56% { 
+        border-radius: 61% 39% 67% 33% / 70% 50% 50% 30%; 
+    } 
+
+  70% { 
+         border-radius: 50% 50% 34% 66% / 56% 68% 32% 44%; 
+    } 
+
+  84% { 
+    border-radius: 46% 54% 50% 50% / 35% 61% 39% 65%; 
+    }
+} 
+
+.navigation a {
+    font-size: 7rem;
+    color: #ccc;
+    letter-spacing: .3rem;
+    margin-bottom: 1rem;
+    position: relative;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s;
+}
+
+.change .navigation a {
+    opacity: 1;
+    visibility: visible;
+    transition: all 0.5s 1.5s;
+}
+
+.navigation a::before {
+    content: attr(data-content);
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #bd9d0f;
+    width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: width .6s ease-in-out;
+}
+
+.navigation a:hover::before {
+    width: 100%;
+}
+
+.menu-icon {
+    position: absolute;
+    top: 7rem;
+    right: 6rem;
+    width: 3.5rem;
+    height: 2rem;
+    cursor: pointer;
+}
+
+.line {
+    width: 3.5rem;
+    height: .2rem;
+    background-color: #caa500;
+    position: absolute;
+}
+
+
+.line-1 {
+    top: 0;
+    left: 0;
+    transition: top .1s 1.6s cubic-bezier(0.23, 1, 0.32, 1), transform .1s;
+}
+
+.change .line-1 {
+    top: .9rem;
+    transform: rotateZ(45deg);
+    transition: top .1s cubic-bezier(0.23, 1, 0.32, 1), transform .3s 1.6s;
+}
+
+.line-2 {
+    width: 60%;
+    top: .9rem;
+    left: .7rem;
+    transition: opacity .1s 1.6s;
+}
+
+.change .line-2 {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.line-3 {
+    top: 1.8rem;
+    transition: top .1s 1.6s cubic-bezier(0.23, 1, 0.32, 1), transform .1s;
+}
+
+.change .line-3 {
+    top: .9rem;
+    transform: rotateZ(-45deg);
+    transition: top .1s cubic-bezier(0.23, 1, 0.32, 1), transform .3s 1.6s;
+}
